@@ -1,0 +1,11 @@
+[Unit]
+Description=Nakshatra App
+After=network.target
+
+[Service]
+ExecStart=/home/vnit/Documents/Nakshatra/start_nakshatra.sh
+Restart=always
+User=vnit
+
+[Install]
+WantedBy=multi-user.target
