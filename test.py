@@ -119,7 +119,7 @@ def reverse(delay2):
 
 # sensor = AS5600(bus, AS5600_id)
 # # The API endpoint
-url = "https://rus00.pythonanywhere.com/upload"
+# url = "https://rus00.pythonanywhere.com/upload"
 
 def withinnn_tolerance(curr_angle, target, tolerance=0.05):
     diff = abs((target - curr_angle + 180) % 360 - 180)
@@ -147,7 +147,7 @@ try:
         sleep(2)
 
         # while (not withinnn_tolerance(curr_angle, target)):
-        while cyclecount <= 10000:
+        while cyclecount <= 100:
             delay2 = 0.05
             
             # delay = 0.1

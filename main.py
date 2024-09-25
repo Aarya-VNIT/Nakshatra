@@ -31,9 +31,9 @@ if __name__ == "__main__":
     model = Model(motor, nks, nano)  
 
     try:
-        #print("Current Angle : ", nano.get_angle())
-        #model.step(float(input("Enter target angle : ")))
-        model.run()
+        print("Current Angle : ", nano.get_angle())
+        model.step(float(input("Enter target angle : ")))
+        # model.run()
     except KeyboardInterrupt:
         log.warning('Detected Keyboard Interrupt')
         log.warning('Quitting Application!!!')
