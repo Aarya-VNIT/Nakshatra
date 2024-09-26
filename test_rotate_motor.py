@@ -14,7 +14,11 @@ GPIO.setup(PIN.RELAY_5V, GPIO.OUT)
 GPIO.setup(PIN.RELAY_TF_PRIMARY, GPIO.OUT)
 GPIO.setup(PIN.RELAY_TF_SECONDARY, GPIO.OUT)
 
+GPIO.setup(PIN.RELAY_MOTOR_SWITCH, GPIO.OUT)
+
 motor = Motor()
+
+TOGGLE_MOTOR = True
 
 try:
     
@@ -27,9 +31,17 @@ try:
     GPIO.output(PIN.RELAY_TF_SECONDARY, GPIO.HIGH)
     sleep(3)
     
-    for _ in range(100):
-        # motor.forward()
-        motor.reverse()
+    for __ in range(10):
+        
+        for _ in range(100):            
+            motor.forward()
+            # motor.reverse()
+        
+        TOGGLE_MOTOR = not TOGGLE_MOTOR
+        
+        GPIO.output(PIN.RELAY_MOTOR_SWITCH, GPIO.HIGH if TOGGLE_MOTOR else GPIO.LOW)
+        sleep(2)
+        
     
     GPIO.output(PIN.RELAY_TF_SECONDARY, GPIO.LOW)
     sleep(3)

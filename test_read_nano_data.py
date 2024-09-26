@@ -14,6 +14,8 @@ try:
     GPIO.output(Pin.RELAY_5V, GPIO.HIGH)
     sleep(2)
     
+    # while True:
+    
     angle = nano.get_angle()
     print(f"Current Angle : {angle}")
 

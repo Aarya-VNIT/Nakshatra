@@ -17,6 +17,9 @@ class Pin:
     STATUS_RELAY_5V: int = 23
     STATUS_RELAY_TF_PRIMARY: int = 24
     
+    RELAY_SENSOR_SWITCH: int = 20
+    RELAY_MOTOR_SWITCH: int = 21
+    
     # RX Pin for Arduino reading
     RX: int = 15 # Not needed, or use
     
