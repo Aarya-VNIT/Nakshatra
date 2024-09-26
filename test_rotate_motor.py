@@ -18,7 +18,7 @@ GPIO.setup(PIN.RELAY_MOTOR_SWITCH, GPIO.OUT)
 
 motor = Motor()
 
-TOGGLE_MOTOR = True
+TOGGLE_MOTOR = False
 
 try:
     
@@ -34,8 +34,8 @@ try:
     for __ in range(10):
         
         for _ in range(100):            
-            motor.forward()
-            # motor.reverse()
+            # motor.forward()
+            motor.reverse()
         
         TOGGLE_MOTOR = not TOGGLE_MOTOR
         

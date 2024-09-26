@@ -21,11 +21,16 @@ class Arduino:
         '''
         return round((data / Arduino.__MAX_BIT) * 360, precision)
 
+    def clear_buffer(self):
+        self.ser.reset_input_buffer()
+
     def get_angle(self):
         # Frequency Data
         # Stores the frequency of the angles
         freq_data = {}
-
+        
+        self.ser.reset_input_buffer()
+        
         for _ in range(Arduino.__NO_OF_READINGS):
             
             if self.ser.in_waiting > 0:
@@ -33,6 +38,7 @@ class Arduino:
                     line = self.ser.readline().rstrip()
                     if len(line) > 0:
                         line = line.decode('utf-8', errors='ignore')
+                        # print(line)
                         angle = self.__convert_to_angle(int(line))
                         freq_data[angle] = (freq_data[angle] if angle in freq_data else 0) + 1
                 except ValueError:
@@ -52,6 +58,8 @@ class Arduino:
         
         if len(freq_data_items) > 10:
             log.warning("Possible garbage values when reading sensor angle")
+            print(len(freq_data_items))
+            print(freq_data_items)
             return -1
         
         # Return the angle with highest frequency
