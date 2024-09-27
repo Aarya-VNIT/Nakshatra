@@ -1,5 +1,5 @@
 import serial
-from RPi import GPIO
+from time import time, sleep
 
 from log import Logger
 
@@ -21,21 +21,31 @@ class Arduino:
         '''
         return round((data / Arduino.__MAX_BIT) * 360, precision)
 
-    def clear_buffer(self):
+    def clear_buffer(self, dump_time: int = 3):
+        
         self.ser.reset_input_buffer()
-
+        
+        self.ser.dtr = False
+        sleep(0.5)
+        self.ser.dtr = True
+        
+        start_time = time()
+        while time() - start_time < dump_time:
+            self.ser.read_all()
+            
+        sleep(1)
+        
     def get_angle(self):
         # Frequency Data
         # Stores the frequency of the angles
         freq_data = {}
-        
-        self.ser.reset_input_buffer()
-        
+                
         for _ in range(Arduino.__NO_OF_READINGS):
             
             if self.ser.in_waiting > 0:
                 try:
                     line = self.ser.readline().rstrip()
+                    # print(line)
                     if len(line) > 0:
                         line = line.decode('utf-8', errors='ignore')
                         # print(line)
@@ -45,10 +55,11 @@ class Arduino:
                     # If some unknown garbage value is being read,
                     # just skip and take the next readings
                     pass
-
+        
         # Sort them based on frequency
         freq_data_items = sorted(freq_data.items(), key = lambda k: k[1], reverse=True)
         
+        # print(freq_data_items)
         if len(freq_data_items) == 0:
             return -1
         
@@ -58,8 +69,6 @@ class Arduino:
         
         if len(freq_data_items) > 10:
             log.warning("Possible garbage values when reading sensor angle")
-            print(len(freq_data_items))
-            print(freq_data_items)
             return -1
         
         # Return the angle with highest frequency

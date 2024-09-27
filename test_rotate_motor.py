@@ -14,6 +14,7 @@ GPIO.setup(PIN.RELAY_5V, GPIO.OUT)
 GPIO.setup(PIN.RELAY_TF_PRIMARY, GPIO.OUT)
 GPIO.setup(PIN.RELAY_TF_SECONDARY, GPIO.OUT)
 
+GPIO.setup(PIN.RELAY_SENSOR_SWITCH, GPIO.OUT)
 GPIO.setup(PIN.RELAY_MOTOR_SWITCH, GPIO.OUT)
 
 motor = Motor()
@@ -25,32 +26,38 @@ try:
     GPIO.output(PIN.RELAY_5V, GPIO.HIGH)
     sleep(3)
     
-    GPIO.output(PIN.RELAY_TF_PRIMARY, GPIO.HIGH)
-    sleep(3)
+    GPIO.output(PIN.RELAY_SENSOR_SWITCH, GPIO.HIGH)
+    input()
     
-    GPIO.output(PIN.RELAY_TF_SECONDARY, GPIO.HIGH)
-    sleep(3)
+    # GPIO.output(PIN.RELAY_TF_PRIMARY, GPIO.HIGH)
+    # sleep(3)
     
-    for __ in range(10):
+    # GPIO.output(PIN.RELAY_TF_SECONDARY, GPIO.HIGH)
+    # sleep(3)
+    
+    # for __ in range(10):
         
-        for _ in range(100):            
-            # motor.forward()
-            motor.reverse()
+    # for _ in range(20):            
+    #     motor.forward()
+            # motor.reverse()
         
-        TOGGLE_MOTOR = not TOGGLE_MOTOR
+        # TOGGLE_MOTOR = not TOGGLE_MOTOR
         
-        GPIO.output(PIN.RELAY_MOTOR_SWITCH, GPIO.HIGH if TOGGLE_MOTOR else GPIO.LOW)
-        sleep(2)
+        # GPIO.output(PIN.RELAY_MOTOR_SWITCH, GPIO.HIGH if TOGGLE_MOTOR else GPIO.LOW)
+        # sleep(2)
         
     
-    GPIO.output(PIN.RELAY_TF_SECONDARY, GPIO.LOW)
-    sleep(3)
+    # GPIO.output(PIN.RELAY_TF_SECONDARY, GPIO.LOW)
+    # sleep(3)
 
-    GPIO.output(PIN.RELAY_TF_PRIMARY, GPIO.LOW)
-    sleep(3)
+    # GPIO.output(PIN.RELAY_TF_PRIMARY, GPIO.LOW)
+    # sleep(3)
+    
+    GPIO.output(PIN.RELAY_SENSOR_SWITCH, GPIO.LOW)
+    sleep(1)
     
     GPIO.output(PIN.RELAY_5V, GPIO.LOW)
-    sleep(3)
+    sleep(1)
 
 except KeyboardInterrupt:
     

@@ -79,6 +79,9 @@ class Model:
         relay_5v_status = GPIO.input(Pin.STATUS_RELAY_5V)
         val_msg = "SWITCHED ON" if relay_5v_status == 1 else "SWITCHED OFF"
         log.debug(f"Relay 5V shows '{val_msg}'")
+    
+        GPIO.output(Pin.RELAY_SENSOR_SWITCH, GPIO.HIGH)
+        sleep(2)
         
         # Calculate actual/current angle
         actual_angle = self.arduino.get_angle()
@@ -244,6 +247,8 @@ class Model:
             log.error("Failed to switch on 5v power supply")
             raise Exception("Failed to switch on 5v power supply")
         
+        self.arduino.clear_buffer(5)
+        
         # ----------------- Nakshatra Step -----------------------
         
         nakshatra_target_angle = self.nakshatra.get_angle_wrt_moon()
@@ -253,12 +258,13 @@ class Model:
         current_sensor_angle = self.arduino.get_angle()
         nakshatra_info = self.nakshatra.info(current_sensor_angle)
         
-        # log.info(f'Nakshatra Angle : {current_sensor_angle:.4f} | Current Nakshatra : {nakshatra_info['name']} | Current Pada : {nakshatra_info['pada']:.1f}')
-        # log.info('Nakshatra Cycle Complete!!!')
+        log.info(f"Nakshatra Angle : {current_sensor_angle:.4f} | Current Nakshatra : {nakshatra_info['name']} | Current Pada : {nakshatra_info['pada']:.1f}")
+        log.info('Nakshatra Cycle Complete!!!')
         
         # ----------------- Switch Systems -----------------------
-        self.__toggle_system()
-        sleep(1)
+        
+
+        self.arduino.clear_buffer(5)
         
         # ----------------- Tithi Step ---------------------------
         tithi_target_angle, tithi = self.nakshatra.get_tithi_and_angle()
@@ -305,31 +311,12 @@ class Model:
         log.info(f"Target Angle {target_angle:.4f} | Current Angle : {actual_angle:.4f}")
                     
         if not is_within_tolerance(actual_angle, target_angle):
-            
-            # Switch on primary transformer
-            GPIO.output(Pin.RELAY_TF_PRIMARY, GPIO.HIGH)
-            log.debug('Switching on : "Relay Transformer Primary"')
-            sleep(2)
-            
-            # Read if the Primary Transformer is switched on
-            relay_tf_primary = GPIO.input(Pin.STATUS_RELAY_TF_PRIMARY)
-            val_msg = "SWITCHED ON" if relay_tf_primary == 1 else "SWITCHED OFF"
-            log.debug(f"Relay TF Primary shows '{val_msg}'")
-            
-            if relay_tf_primary == 0:
-                log.error("Failed to switch on Transformer Power Supply")
-            
-            else:
-                # Switch on secondary transformer
-                GPIO.output(Pin.RELAY_TF_SECONDARY, GPIO.HIGH)
-                log.debug('Switching on : "Relay Transformer Secondary"')
-                sleep(2)
-            
+                        
             prev_angle = actual_angle
             
             try:
                 # Move the motor to withing the tolerance region
-                while relay_tf_primary == 1 and not is_within_tolerance(actual_angle, target_angle):
+                while not is_within_tolerance(actual_angle, target_angle):
                     
                     # Get the direction to move the needle
                     isReverse = get_direction(actual_angle, target_angle)
@@ -376,21 +363,100 @@ class Model:
                 log.warning("An error occurred while moving the motor")
                 log.warning("Ending current run!!!")        
             
-            finally:
-                # Switch off Secondary Transformer
-                GPIO.output(Pin.RELAY_TF_SECONDARY, GPIO.LOW)
-                log.debug('Switching off : "Relay Transformer Secondary"')
-                sleep(1)
-                
-                # Switch off Primary Transformer
-                GPIO.output(Pin.RELAY_TF_PRIMARY, GPIO.LOW)
-                log.debug('Switching off : "Relay Transformer Primary"')
-                sleep(3)
-                
-                # Read if the Primary Transformer is switched off
-                val = GPIO.input(Pin.STATUS_RELAY_TF_PRIMARY)
-                val_msg = "SWITCHED ON" if val == 1 else "SWITCHED OFF"
-                log.debug(f"Relay TF Primary shows '{val_msg}'")
+    def step3(self):
+        
+        # Switch on 5V supply
+        GPIO.output(Pin.RELAY_TF_PRIMARY, GPIO.HIGH)
+        sleep(2)
+        
+
+        # Nakshatra Cycle
+
+        GPIO.output(Pin.RELAY_5V, GPIO.HIGH)
+        sleep(2)
+
+        self.arduino.clear_buffer(5)
+        sleep(2)
+
+
+        actual_angle = self.arduino.get_angle()
+        initial_angle = actual_angle
+        
+        nakshatra_target_angle = self.nakshatra.get_angle_wrt_moon()
+
+        log.info(f"Nakshatra Angle : {nakshatra_target_angle} --- Current Angle : {actual_angle}")
+
+        if not is_within_tolerance(actual_angle, nakshatra_target_angle):
+            
+            GPIO.output(Pin.RELAY_TF_SECONDARY, GPIO.HIGH)
+            sleep(2)
+            
+            self.__rotate_motor(nakshatra_target_angle)
+
+            GPIO.output(Pin.RELAY_TF_SECONDARY, GPIO.LOW)
+            sleep(2)
+
+        GPIO.output(Pin.RELAY_5V, GPIO.LOW)
+        sleep(2)
+
+
+        # Tithi Cycle
+        GPIO.output(Pin.RELAY_5V, GPIO.HIGH)
+        sleep(2)
+
+        GPIO.output(Pin.RELAY_SENSOR_SWITCH, GPIO.HIGH)
+        sleep(1)
+
+        self.arduino.clear_buffer(5)
+
+        actual_angle = self.arduino.get_angle()
+        initial_angle = actual_angle
+        
+        tithi_angle, tithi = self.nakshatra.get_tithi_and_angle()
+
+        log.info(f"Tithi Angle : {tithi_angle} --- Current Angle : {actual_angle}")
+
+        if not is_within_tolerance(actual_angle, tithi_angle):
+            
+            GPIO.output(Pin.RELAY_MOTOR_SWITCH, GPIO.HIGH)
+            sleep(1)
+
+            GPIO.output(Pin.RELAY_TF_SECONDARY, GPIO.HIGH)
+            sleep(2)
+
+            for _ in range(20):
+                self.motor.forward()
+            
+            # self.__rotate_motor(tithi_angle)
+
+            GPIO.output(Pin.RELAY_TF_SECONDARY, GPIO.LOW)
+            sleep(2)
+
+            GPIO.output(Pin.RELAY_MOTOR_SWITCH, GPIO.LOW)
+            sleep(1)
+
+        GPIO.output(Pin.RELAY_SENSOR_SWITCH, GPIO.LOW)
+        sleep(1)
+    
+
+        GPIO.output(Pin.RELAY_5V, GPIO.LOW)
+        sleep(2)
+        
+
+        GPIO.output(Pin.RELAY_TF_PRIMARY, GPIO.LOW)
+        sleep(2)
+    
+        is_tf_primary_on = GPIO.input(Pin.STATUS_RELAY_TF_PRIMARY)
+        
+        if is_tf_primary_on == 1:
+
+            log.debug("Waiting for Transformer Secondary Voltage Sensor to be discharged!!!")
+            sleep(30)
+
+            # Read if the Primary Transformer is switched off
+            val = GPIO.input(Pin.STATUS_RELAY_TF_PRIMARY)
+            val_msg = "SWITCHED ON" if val == 1 else "SWITCHED OFF"
+            log.debug(f"Finally Relay TF Primary shows '{val_msg}'")
         
     def run(self, repeat_every = None):
         '''
@@ -412,7 +478,8 @@ class Model:
             
             # Check and update the needle angle based on nakshatra
             try:
-                self.step()
+                # self.step()
+                self.step3()
                 
             except Exception as e:
                 log.error("Error Occurred in this cycle")
