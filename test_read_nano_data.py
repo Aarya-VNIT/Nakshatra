@@ -20,7 +20,7 @@ try:
     for _ in range(20):
             
         GPIO.output(Pin.RELAY_SENSOR_SWITCH, GPIO.HIGH if TOGGLE_SENSOR else GPIO.LOW)
-        sleep(20)
+        sleep(2)
             
         angle = nano.get_angle()
         print(f"Current System : {'B' if TOGGLE_SENSOR else 'A'}")

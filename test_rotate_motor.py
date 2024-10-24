@@ -28,8 +28,9 @@ try:
     GPIO.output(PIN.RELAY_5V, GPIO.HIGH)
     sleep(3)
     
-    # GPIO.output(PIN.RELAY_MOTOR_SWITCH, GPIO.HIGH)
-    # sleep(1)
+    GPIO.output(PIN.RELAY_MOTOR_SWITCH, GPIO.HIGH)
+    GPIO.output(PIN.RELAY_SENSOR_SWITCH, GPIO.HIGH)
+    sleep(1)
     # input()
     
     GPIO.output(PIN.RELAY_TF_PRIMARY, GPIO.HIGH)
