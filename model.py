@@ -1,5 +1,5 @@
 from typing import *
-from time import sleep
+from time import sleep, time
 
 from RPi import GPIO
 
@@ -300,10 +300,10 @@ class Model:
             val_msg = "SWITCHED ON" if val == 1 else "SWITCHED OFF"
             log.debug(f"Finally Relay TF Primary shows '{val_msg}'")
 
-    def __rotate_motor(self, target_angle: float):
+    def __rotate_motor(self, target_angle: float, timeout: int = 10):
                 
-        same_counter = 0
-        
+        same_counter = 250
+
         # Calculate actual/current angle
         actual_angle = self.arduino.get_angle()
         initial_angle = actual_angle
@@ -313,7 +313,8 @@ class Model:
         if not is_within_tolerance(actual_angle, target_angle):
                         
             prev_angle = actual_angle
-            
+            start_time = time()
+
             try:
                 # Move the motor to withing the tolerance region
                 while not is_within_tolerance(actual_angle, target_angle):
@@ -335,13 +336,25 @@ class Model:
                         break
                                         
                     # Logic to stop the motor after some time, (in a scenario if motor is stuck in rotation)
-                    if is_within_tolerance(actual_angle, prev_angle):
+                    if is_within_tolerance(actual_angle, prev_angle, 1):
                         same_counter -= 1
+                        # print('Same Counter', same_counter)
                         
                     else:
-                        same_counter = 100
+                        same_counter = 250
+                        prev_angle = actual_angle
+                        # print('Same Counter', same_counter)
+                        # print('Outside Tolerance!! Modified initial angle to ', prev_angle)
                         
-                    if same_counter == 0:
+                    # print(f'Start Time : {start_time} ~ Current Time : {time()}')
+                    # print(f'Current Angle : {actual_angle}')
+
+                    if (time() - start_time) > timeout and same_counter <= 0:
+                        log.warning(f"Warning: Motor is moving continuously for more than {timeout} seconds!!")
+                        log.warning(f"Stopping Motor!!! Contact Technical Assisstance!!!")
+                        break
+
+                    if same_counter <= 0:
                         break
                     
                 if same_counter == 0:
@@ -377,7 +390,6 @@ class Model:
 
         self.arduino.clear_buffer(5)
         sleep(2)
-
 
         actual_angle = self.arduino.get_angle()
         initial_angle = actual_angle

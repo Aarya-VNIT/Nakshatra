@@ -68,6 +68,7 @@ class Arduino:
             return -1
         
         if len(freq_data_items) > 10:
+            print(freq_data_items)
             log.warning("Possible garbage values when reading sensor angle")
             return -1
         

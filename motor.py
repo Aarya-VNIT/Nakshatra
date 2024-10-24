@@ -10,7 +10,7 @@ class Motor:
     Allows you to control motor motion.
     '''
     
-    __PULSE_DELAY = 0.001
+    __PULSE_DELAY = 0.005
     __NO_OF_PULSES = 10
     
     def __init__(self, delay: int = 0.035) -> None:

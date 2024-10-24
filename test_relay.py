@@ -21,44 +21,48 @@ try:
         GPIO.output(Pin.RELAY_5V, GPIO.HIGH)
         sleep(2)
 
+        print("Relay Sensor Switch ON")
         GPIO.output(Pin.RELAY_SENSOR_SWITCH, GPIO.HIGH)
         sleep(2)
 
+        print("Relay Motor Switch ON")
         GPIO.output(Pin.RELAY_MOTOR_SWITCH, GPIO.HIGH)
         sleep(2)
 
-        GPIO.output(Pin.RELAY_MOTOR_SWITCH, GPIO.LOW)
-        sleep(2)
-        
+        print("Relay TF P ON")
+        # input()
+        GPIO.output(Pin.RELAY_TF_PRIMARY, GPIO.HIGH)
+        sleep(1)
+
+        print("Relay TF S ON")
+        # input()
+        GPIO.output(Pin.RELAY_TF_SECONDARY, GPIO.HIGH)
+        sleep(5)
+
+        print("Relay FAN ON")
+        # input()
+        GPIO.output(Pin.RELAY_FAN, GPIO.HIGH)
+        sleep(5)
+
+        print("Relay FAN OFF")
+        GPIO.output(Pin.RELAY_FAN, GPIO.LOW)
+        sleep(0.5)
+
+        print("Relay TF S OFF")
+        GPIO.output(Pin.RELAY_TF_SECONDARY, GPIO.LOW)
+        sleep(0.5)
+
+        print("Relay TF P OFF")
+        GPIO.output(Pin.RELAY_TF_PRIMARY, GPIO.LOW)
+        sleep(0.5)
+
+        print("Relay Motor Switch OFF")
         GPIO.output(Pin.RELAY_SENSOR_SWITCH, GPIO.LOW)
         sleep(2)
 
-        # print("Relay TF P ON")
-        # # input()
-        # GPIO.output(Pin.RELAY_TF_PRIMARY, GPIO.HIGH)
-        # sleep(1)
-
-        # print("Relay TF S ON")
-        # # input()
-        # GPIO.output(Pin.RELAY_TF_SECONDARY, GPIO.HIGH)
-        # sleep(5)
-
-        # print("Relay FAN ON")
-        # # input()
-        # GPIO.output(Pin.RELAY_FAN, GPIO.HIGH)
-        # sleep(5)
-
-        # print("Relay FAN OFF")
-        # GPIO.output(Pin.RELAY_FAN, GPIO.LOW)
-        # sleep(0.5)
-
-        # print("Relay TF S OFF")
-        # GPIO.output(Pin.RELAY_TF_SECONDARY, GPIO.LOW)
-        # sleep(0.5)
-
-        # print("Relay TF P OFF")
-        # GPIO.output(Pin.RELAY_TF_PRIMARY, GPIO.LOW)
-        # sleep(0.5)
+        print("Relay Sensor Switch OFF")
+        GPIO.output(Pin.RELAY_MOTOR_SWITCH, GPIO.LOW)
+        sleep(2)
 
         print("Relay 5V OFF")
         GPIO.output(Pin.RELAY_5V, GPIO.LOW)
