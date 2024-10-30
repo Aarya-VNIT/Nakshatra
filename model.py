@@ -306,8 +306,6 @@ class Model:
         log.debug(f"Relay TF Primary shows '{val_msg}'")
     
 
-        # Nakshatra Cycle
-        log.info("Starting Nakshatra Run....")
         
         log.debug("Switching ON 5V Supply")
         GPIO.output(Pin.RELAY_5V, GPIO.HIGH)
@@ -320,6 +318,9 @@ class Model:
     
         self.arduino.clear_buffer(5)
         sleep(2)
+
+        # Nakshatra Cycle
+        log.info("Starting Nakshatra Run....")
 
         actual_angle = self.arduino.get_angle()
         
@@ -342,25 +343,27 @@ class Model:
         nakshatra_info = self.nakshatra.info(nakshatra_target_angle)
         log.info(f"Current Nakshatra : {nakshatra_info['name']} | Current Pada : {nakshatra_info['pada']}")
 
-        log.debug("Switching OFF 5V Supply")
-        GPIO.output(Pin.RELAY_5V, GPIO.LOW)
-        sleep(2)
+        # log.debug("Switching OFF 5V Supply")
+        # GPIO.output(Pin.RELAY_5V, GPIO.LOW)
+        # sleep(2)
 
-        # Read if the relay is switched on
-        relay_5v_status = GPIO.input(Pin.STATUS_RELAY_5V)
-        val_msg = "SWITCHED ON" if relay_5v_status == 1 else "SWITCHED OFF"
-        log.debug(f"Relay 5V shows '{val_msg}'")
+        # # Read if the relay is switched on
+        # relay_5v_status = GPIO.input(Pin.STATUS_RELAY_5V)
+        # val_msg = "SWITCHED ON" if relay_5v_status == 1 else "SWITCHED OFF"
+        # log.debug(f"Relay 5V shows '{val_msg}'")
 
         # ------------------------ Tithi Cycle --------------------------
 
-        log.debug("Switching ON 5V Supply")
-        GPIO.output(Pin.RELAY_5V, GPIO.HIGH)
-        sleep(2)
+        log.info("Starting Tithi Run.....")
 
-        # Read if the relay is switched on
-        relay_5v_status = GPIO.input(Pin.STATUS_RELAY_5V)
-        val_msg = "SWITCHED ON" if relay_5v_status == 1 else "SWITCHED OFF"
-        log.debug(f"Relay 5V shows '{val_msg}'")
+        # log.debug("Switching ON 5V Supply")
+        # GPIO.output(Pin.RELAY_5V, GPIO.HIGH)
+        # sleep(2)
+
+        # # Read if the relay is switched on
+        # relay_5v_status = GPIO.input(Pin.STATUS_RELAY_5V)
+        # val_msg = "SWITCHED ON" if relay_5v_status == 1 else "SWITCHED OFF"
+        # log.debug(f"Relay 5V shows '{val_msg}'")
 
         log.debug("Switching ON RELAY_SENSOR")
         GPIO.output(Pin.RELAY_SENSOR_SWITCH, GPIO.HIGH)
@@ -394,15 +397,15 @@ class Model:
             GPIO.output(Pin.RELAY_MOTOR_SWITCH, GPIO.LOW)
             sleep(1)
 
-        log.info(f'Current Tithi : {tithi}')
-
         log.debug("Switching OFF SENSOR_SWITCH")
         GPIO.output(Pin.RELAY_SENSOR_SWITCH, GPIO.LOW)
         sleep(1)
+
+        log.info(f'Current Tithi : {tithi}')
     
         log.debug("Switching OFF 5V Supply")
         GPIO.output(Pin.RELAY_5V, GPIO.LOW)
-        sleep(2)
+        sleep(5)
 
         # Read if the relay is switched on
         relay_5v_status = GPIO.input(Pin.STATUS_RELAY_5V)

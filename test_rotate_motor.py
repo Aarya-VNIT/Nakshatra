@@ -28,9 +28,7 @@ try:
     GPIO.output(PIN.RELAY_5V, GPIO.HIGH)
     sleep(3)
     
-    GPIO.output(PIN.RELAY_MOTOR_SWITCH, GPIO.HIGH)
-    GPIO.output(PIN.RELAY_SENSOR_SWITCH, GPIO.HIGH)
-    sleep(1)
+
     # input()
     
     GPIO.output(PIN.RELAY_TF_PRIMARY, GPIO.HIGH)
@@ -44,11 +42,22 @@ try:
     prev_angle = -1
     while True:
 
+        system = int(input('Enter System (0 or 1): '))
+
+        if system == 0:
+            GPIO.output(PIN.RELAY_MOTOR_SWITCH, GPIO.LOW)
+            GPIO.output(PIN.RELAY_SENSOR_SWITCH, GPIO.LOW)
+        
+        else:
+            GPIO.output(PIN.RELAY_MOTOR_SWITCH, GPIO.HIGH)
+            GPIO.output(PIN.RELAY_SENSOR_SWITCH, GPIO.HIGH)
+            
+        sleep(1)
+        
         nano.clear_buffer()
 
         angle = nano.get_angle()
-        print("Prev angle : ", prev_angle, 'Angle :', angle)
-
+        print('Angle :', angle)
         prev_angle = angle
 
         angle = int(input("Input Angle: "))
@@ -60,6 +69,12 @@ try:
                 motor.forward()
             else:
                 motor.reverse()
+
+        nano.clear_buffer()
+
+        angle = nano.get_angle()
+        print("Prev angle : ", prev_angle, 'Angle :', angle)
+        
         
 
 
